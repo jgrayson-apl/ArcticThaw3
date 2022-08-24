@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0 maximum-scale=1.0"/>
+    <!-- META -->
+    <!--<meta property="og:title" content="">-->
+    <!--<meta property="og:description" content="">-->
+    <!--<meta property="og:image" content="https://geoxc-apps.bd.esri.com/assets/GeoXC.png">-->
+    <!--<meta property="og:url" content="https://geoxc-apps.bd.esri.com/Woodwell/ArcticThaw/index.html">-->
+    <!-- ICON -->
+    <link rel="icon" href="./assets/favicon.ico" sizes="32x32" type="image/vnd.microsoft.icon">
+    <!-- TITLE -->
+    <title class="application-title"></title>
+    
+    <!-- CHARTJS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js" integrity="sha512-QSkVNOCYLtj73J4hbmVoOV6KVZuMluZlioC+trLpewV8qMjsWqlIQvkn1KGX2StWvPMdWGBqim1xlC8krl1EKQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    
+    <!-- CALCITE -->
+    <script src="https://js.arcgis.com/calcite-components/1.0.0-beta.86/calcite.esm.js" type="module"></script>
+    <link href="https://js.arcgis.com/calcite-components/1.0.0-beta.86/calcite.css" rel="stylesheet"/>
+    
+    <!-- ArcGIS API for JavaScript-->
+    <link href="https://js.arcgis.com/4.24/@arcgis/core/assets/esri/themes/dark/main.css" rel="stylesheet"/>
+    <script src="https://js.arcgis.com/4.24/"></script>
+    
+    <!-- APPLICATION -->
+    <link rel="stylesheet" type="text/css" href="./css/app-base.css"/>
+    <link rel="stylesheet" type="text/css" href="./css/application.css">
+    <script type="module" src="./js/Application.js"></script>
+  </head>
+  <body class="calcite-theme-dark">
+    <calcite-shell dir="ltr">
+      
+      <header class="content-row" slot="header">
+        <h2 class="application-title"></h2>
+        
+        <div class="content-row">
+          
+          <div id="sign-in-container"></div>
+          
+          <calcite-action-bar class="content-row" expand-disabled="true">
+            <calcite-action id="app-share-action" appearance="clear" scale="m" title="share current options..." text="share current options" icon="link"></calcite-action>
+            <calcite-action id="app-details-action" appearance="clear" scale="m" title="app details..." text="app details" icon="information"></calcite-action>
+          </calcite-action-bar>
+          
+          <!-- SHAREABLE ALERT -->
+          <calcite-alert id="app-share-alert" icon="launch" placement="bottom" closable auto-dismiss auto-dismiss-duration="medium" scale="m" color="green">
+            <div slot="message">
+              Shareable link has been copied to the clipboard.
+            </div>
+            <calcite-link id="app-share-link" slot="link" href="#" target="_blank" role="link" title="open in new tab">
+              open in new tab
+            </calcite-link>
+          </calcite-alert>
+          
+          <!-- NOTICES ADN ALERTS -->
+          <calcite-alert id="app-notice" icon="" scale="m" width="auto" closable color="red">
+            <div slot="title"></div>
+            <div slot="message"></div>
+          </calcite-alert>
+        
+        </div>
+      </header>
+      
+      <!-- LEFT -->
+      <calcite-shell-panel slot="primary-panel" position="start" width-scale="m" collapsed="false">
+        
+        <calcite-action-bar id="side-panel-action-bar" slot="action-bar">
+          <calcite-action text="Trends" title="trend layers" icon="layers" class="toggle-action" data-toggle="trends" active></calcite-action>
+        </calcite-action-bar>
+        <div class="calcite-panel-content">
+          
+          <calcite-block heading="Trend Durations" summary="number of years" class="toggle-panel content-static" data-toggle="trends" open>
+            <calcite-icon slot="icon" icon="clock"></calcite-icon>
+            <calcite-action slot="control" icon="x" title="close panel" class="toggle-close" data-toggle="trends"></calcite-action>
+            <calcite-radio-group id="duration-options" width="full">
+              <calcite-radio-group-item id="duration-60" value="60">60 yrs</calcite-radio-group-item>
+              <calcite-tooltip reference-element="duration-60" overlay-positioning="fixed" placement="bottom">1959 to 2019</calcite-tooltip>
+              <calcite-radio-group-item id="duration-50" value="50">50 yrs</calcite-radio-group-item>
+              <calcite-tooltip reference-element="duration-50" overlay-positioning="fixed" placement="bottom">1969 to 2019</calcite-tooltip>
+              <calcite-radio-group-item id="duration-40" value="40" checked>40 yrs</calcite-radio-group-item>
+              <calcite-tooltip reference-element="duration-40" overlay-positioning="fixed" placement="bottom">1979 to 2019</calcite-tooltip>
+              <calcite-radio-group-item id="duration-30" value="30">30 yrs</calcite-radio-group-item>
+              <calcite-tooltip reference-element="duration-30" overlay-positioning="fixed" placement="bottom">1989 to 2019</calcite-tooltip>
+              <calcite-radio-group-item id="duration-20" value="20">20 yrs</calcite-radio-group-item>
+              <calcite-tooltip reference-element="duration-20" overlay-positioning="fixed" placement="bottom">1999 to 2019</calcite-tooltip>
+            </calcite-radio-group>
+          </calcite-block>
+          
+          <calcite-block heading="Analysis Layers" summary="historical trend layers" class="content-fill" collapsible open>
+            <calcite-icon slot="icon" icon="layers"></calcite-icon>
+            <div class="calcite-block-fill">
+              
+              <calcite-radio-group id="layer-options" width="full" class="trailer-l">
+                <calcite-radio-group-item value="temp-means" checked>Air Temperature</calcite-radio-group-item>
+                <calcite-radio-group-item value="frozen-days">Frozen Ground</calcite-radio-group-item>
+              </calcite-radio-group>
+              
+              <calcite-block id="temp-means-block" class="layer-block" heading="Air Temperature" summary="surface air temperature trend" open active>
+                <div slot="icon" class="temp-means-icon trend-icon-m"></div>
+                <div slot="control" class="content-row">
+                  <calcite-action id="temp-means-info-icon" slot="actions-end" icon="information"></calcite-action>
+                  <calcite-popover heading="Air Temperature" auto-close="true" placement="bottom-leading" overlay-positioning="fixed" reference-element="temp-means-info-icon">
+                    <div class="padding-l font-size-m" style="width:350px;">
+                      This variable represents surface air temperature at 1/24° (~4 km) spatial resolution, derived from the TerraClimate data set (Abatzglou et al., 2018)."
+                    </div>
+                  </calcite-popover>
+                </div>
+                <div class="padding-m">
+                  <div class="trend-color-ramp temp-means-ramp"></div>
+                  <div class="content-row font-size-s">
+                    <span>decrease</span> <span>increase</span>
+                  </div>
+                </div>
+                <div id="temp-means-trend-panel" class="panel-content panel-no-border content-col content-static" trend="">
+                  <div class="content-row">
+                    <div id="temp-means-diff" class="temp-means-indicator content-fill">
+                      
+                      <div class="panel-content panel-no-margin content-row content-fill">
+                        <div class="abz-section content-col content-fill">
+                          <div class="diff-label">Arctic Boreal Zone</div>
+                          <div class="diff-value">--</div>
+                          <div class="diff-msg">C per decade</div>
+                        </div>
+                        <div class="location-section content-col content-fill">
+                          <div class="diff-label">Analysis Location</div>
+                          <div class="diff-value">--</div>
+                          <div class="diff-msg">C per decade</div>
+                        </div>
+                      </div>
+                    
+                    </div>
+                  </div>
+                
+                </div>
+              </calcite-block>
+              
+              <calcite-block id="frozen-days-block" class="layer-block" heading="Frozen Ground" summary="number of frozen days trend" open>
+                <div slot="icon" class="frozen-days-icon trend-icon-m"></div>
+                <div slot="control" class="content-row">
+                  <calcite-action id="frozen-days-info-icon" slot="actions-end" icon="information"></calcite-action>
+                  <calcite-popover reference-element="frozen-days-info-icon" auto-close="true" heading="Frozen Ground" placement="bottom-leading" overlay-positioning="fixed">
+                    <div class="padding-l font-size-m" style="width:350px;">
+                      This variable represents the number of days the ground surface was frozen according to the Freeze-thaw Earth System Data Record (FT-ESDR), which is based on satellite microwave remote sensing of brightness temperatures (Kim et al., 2017).
+                    </div>
+                  </calcite-popover>
+                </div>
+                <div class="padding-m">
+                  <div class="trend-color-ramp frozen-days-ramp"></div>
+                  <div class="content-row font-size-s">
+                    <span>decrease</span> <span>increase</span>
+                  </div>
+                </div>
+                <div id="frozen-days-trend-panel" class="panel-content panel-no-border content-col content-static" trend="">
+                  <div class="content-row">
+                    <div id="frozen-days-diff" class="frozen-days-indicator content-fill">
+                      
+                      <div class="panel-content panel-no-margin content-row content-fill">
+                        <div class="abz-section content-col content-fill">
+                          <div class="diff-label">Arctic Boreal Zone</div>
+                          <div class="diff-value">--</div>
+                          <div class="diff-msg">days per decade</div>
+                        </div>
+                        <div class="location-section content-col content-fill">
+                          <div class="diff-label">Analysis Location</div>
+                          <div class="diff-value">--</div>
+                          <div class="diff-msg">days per decade</div>
+                        </div>
+                      </div>
+                    
+                    </div>
+                  </div>
+                
+                
+                </div>
+              </calcite-block>
+            
+            </div>
+          </calcite-block>
+        
+        </div>
+      
+      </calcite-shell-panel>
+      
+      <!-- CENTER -->
+      <div id="center-container" class="content-col content-fill">
+        <div id="view-container">
+          <calcite-loader id="view-updating" type="indeterminate" scale="s"></calcite-loader>
+        </div>
+      </div>
+      
+      <!-- RIGHT -->
+      <calcite-shell-panel slot="contextual-panel" position="end" width-scale="m" collapsed="false">
+        <calcite-action-bar slot="action-bar">
+          <calcite-action text="Analysis" icon="graph-time-series" class="toggle-action" data-toggle="analysis" active></calcite-action>
+        </calcite-action-bar>
+        <div class="calcite-panel-content">
+          
+          <calcite-block heading="Analysis Location" summary="location or place trends" class="toggle-panel content-static" data-toggle="analysis" open>
+            <calcite-icon slot="icon" icon="map-pin"></calcite-icon>
+            <calcite-action slot="control" icon="x" title="close panel" class="toggle-close" data-toggle="analysis"></calcite-action>
+  
+            <div class="margin-m">
+              <calcite-tabs id="summary-tabs">
+                <calcite-tab-nav slot="tab-nav">
+                  <calcite-tab-title tab="location" icon-start="pin" active>Location</calcite-tab-title>
+                  <calcite-tab-title tab="place" icon-start="home">Place</calcite-tab-title>
+                </calcite-tab-nav>
+                <calcite-tab tab="location" active>
+                  <div class="margin-s">
+                    <calcite-button id="search-location-btn" icon-start="pin-plus" icon-end="blank" width="full" color="neutral" appearance="solid">set map location</calcite-button>
+                  </div>
+                </calcite-tab>
+                <calcite-tab id="address-tab" tab="place">
+                  <div class="search-parent-container margin-s">
+                    <div id="search-container"></div>
+                  </div>
+                </calcite-tab>
+              </calcite-tabs>
+            </div>
+  
+            <div class="margin-m">
+              <calcite-label>
+                <div>Coordinates</div>
+                <calcite-input id="analysis-location-coordinates-input" type="text" icon="point" placeholder="coordinates" read-only>
+                  <calcite-button id="analysis-location-coordinates-clear-btn" slot="action" appearance="solid" color="neutral" icon-start="trash"></calcite-button>
+                </calcite-input>
+              </calcite-label>
+            </div>
+            
+          </calcite-block>
+          
+          <calcite-block heading="Thawing Trends" summary="historical trends" class="content-fill" collapsible open>
+            <calcite-icon slot="icon" icon="graph-time-series"></calcite-icon>
+            <div class="calcite-block-fill">
+              
+              <div class="content-col content-static">
+                <canvas id="temp-means-trend-chart" class="trend-chart"></canvas>
+              </div>
+              <div class="content-col content-static">
+                <canvas id="frozen-days-trend-chart" class="trend-chart "></canvas>
+              </div>
+            
+            </div>
+          </calcite-block>
+        
+        </div>
+      </calcite-shell-panel>
+    
+    </calcite-shell>
+    
+    <!-- LOADER -->
+    <calcite-loader id="app-loader" active="true" type="indeterminate" scale="l"></calcite-loader>
+    
+    <!-- APP DETAILS MODAL -->
+    <calcite-modal id="app-details-modal" color="blue" background-color="grey" scale="m" width="m" role="dialog" aria-labelledby="app-modal-title">
+      <h3 slot="header" id="app-modal-title" class="application-title"></h3>
+      <div slot="content" class="application-description"></div>
+      <div slot="secondary" class="margin-m">
+        <calcite-label layout="inline">
+          <span>hide on startup</span>
+          <calcite-checkbox id="hide-startup-checkbox"></calcite-checkbox>
+        </calcite-label>
+      </div>
+      <calcite-button id="app-details-ok-btn" slot="primary" width="full" hidden>OK</calcite-button>
+    </calcite-modal>
+  
+  
+  </body>
+</html>

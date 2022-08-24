@@ -1,0 +1,322 @@
+html, body {
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  overflow: hidden;
+}
+
+.calcite-theme-light,
+.calcite-theme-dark {
+  --calcite-ui-info: #ff2200;
+  --calcite-ui-brand: #fa3817;
+  /*--calcite-ui-icon-color: #fa3817;*/
+  --calcite-ui-brand-hover: #99220f;
+  --calcite-ui-brand-press: #ff9180;
+
+  --theme-blue-color: #439bff;
+  --theme-white-color: #ffffff;
+  --theme-red-color: #fa3817;
+
+  --theme-svg-icon-size: 20px;
+
+}
+
+
+calcite-radio-group-item[checked],
+calcite-button[active] {
+  --calcite-ui-icon-color: var(--calcite-ui-text-1) !important;
+  --calcite-ui-text-inverse: var(--calcite-ui-text-1) !important;
+}
+
+[icon="exclamation-mark-triangle-f"] {
+  --calcite-ui-icon-color: #d90012;
+}
+
+.calcite-panel-content {
+  margin-top: 0;
+  margin-bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  flex-grow: 0;
+  flex-shrink: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow-y: hidden;
+}
+
+.calcite-block-fill {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  flex-grow: 1;
+  flex-shrink: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.esri-widget,
+.esri-widget__heading,
+.esri-widget--button,
+.esri-menu,
+.esri-popup__button,
+.esri-popup__main-container,
+.esri-popup__header-container--button:hover,
+.esri-popup__pointer-direction,
+.esri-button {
+  background-color: var(--calcite-ui-foreground-1) !important;
+  /*color: var(--calcite-ui-brand-hover) !important;*/
+}
+
+.toggle-panel[hidden] {
+  display: none;
+}
+
+header[slot="header"] {
+  z-index: 99;
+  padding: 0 1rem 0 1rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid var(--calcite-ui-brand);
+}
+
+.application-title {
+  color: var(--calcite-ui-brand);
+}
+
+calcite-loader#app-loader {
+  align-self: center;
+  justify-self: center;
+  /*z-index: 1000;*/
+  /*top: calc(50vh - 112px) !important;*/
+}
+
+.esri-ui-corner calcite-loader {
+  pointer-events: none;
+  padding: 0;
+  right: 15px;
+}
+
+
+calcite-panel > div[slot="header-actions-end"] {
+  display: inline-flex;
+}
+
+calcite-notice {
+  z-index: 101;
+}
+
+#center-container {
+  flex-grow: 1;
+  flex-shrink: 1;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(#439bff, #2b2b2b); /* #34547c #439bff */
+}
+
+#view-container:empty {
+  opacity: 0;
+}
+
+#view-container {
+  flex-grow: 1;
+  flex-shrink: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: transparent;
+}
+
+#view-container canvas {
+  filter: drop-shadow(0 0 15px rgba(0, 0, 0, 0.8));
+}
+
+.trend-color-ramp {
+  height: 1rem;
+  width: 100%;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.temp-means-ramp {
+  background: linear-gradient(to right, var(--theme-blue-color) 0%, var(--theme-white-color) 50%, var(--theme-red-color) 100%);
+}
+
+.frozen-days-ramp {
+  background: linear-gradient(to right, var(--theme-red-color) 0%, var(--theme-white-color) 50%, var(--theme-blue-color) 100%);
+}
+
+calcite-tabs {
+  flex-grow: 1;
+  flex-shrink: 1;
+}
+
+calcite-tab {
+  overflow: hidden;
+}
+
+.info-panel {
+  height: 100px;
+}
+
+calcite-radio-group-item[disabled] {
+  pointer-events: none;
+  opacity: 0.3;
+}
+
+.trend-panels .panel-content {
+  height: auto;
+}
+
+
+.temp-means-indicator[trend="increase"] {
+  color: var(--theme-red-color);
+}
+
+.temp-means-indicator[trend=""] {
+  color: var(--theme-white-color);
+}
+
+.temp-means-indicator[trend="decrease"] {
+  color: var(--theme-blue-color);
+}
+
+.frozen-days-indicator[trend="increase"] {
+  color: var(--theme-blue-color);
+}
+
+.frozen-days-indicator[trend=""] {
+  color: var(--theme-white-color);
+}
+
+.frozen-days-indicator[trend="decrease"] {
+  color: var(--theme-red-color);
+}
+
+.temp-means-icon,
+.frozen-days-icon {
+  display: block;
+  margin: auto;
+  width: var(--theme-svg-icon-size);
+  height: var(--theme-svg-icon-size);
+  background-size: var(--theme-svg-icon-size) var(--theme-svg-icon-size);
+  background-repeat: no-repeat;
+}
+
+.temp-means-icon {
+  background-image: url(../assets/extreme-heat.svg);
+}
+
+.frozen-days-icon {
+  background-image: url(../assets/snowflake.svg);
+}
+
+
+calcite-block {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+calcite-block.layer-block {
+  border-left: solid 4px transparent;
+}
+
+calcite-block.layer-block[active] {
+  border-left-color: var(--calcite-ui-brand);
+}
+
+calcite-block[slot="control"] {
+  height: 100%;
+}
+
+calcite-radio-group-item {
+  --calcite-ui-background: var(--theme-white-color);
+}
+
+.trend-chart {
+  height: 250px !important;
+}
+
+.view-no-interaction {
+  pointer-events: none;
+}
+
+
+.slides-container {
+  box-shadow: none !important;
+}
+
+.slides-container calcite-button {
+  margin-left: 0.5rem;
+}
+
+.view-no-interaction .slides-container {
+  display: none;
+}
+
+img[scale="s"] {
+  margin-left: 5px;
+  height: 1.1rem;
+  border-radius: 0.25rem;
+}
+
+calcite-tabs {
+  min-height: 85px !important;
+}
+
+.search-parent-container {
+  height: 2rem;
+}
+
+.esri-search {
+  padding: 0 25px 0 25px;
+  width: auto;
+  left: 0;
+  right: 0;
+  position: absolute;
+}
+
+.esri-search__suggestions-menu {
+  z-index: 99;
+  position: absolute;
+}
+
+.diff-label {
+  text-align: center;
+  font-weight: 600;
+  font-size: 11pt;
+}
+
+.diff-value {
+  color: var(--calcite-ui-text-1);
+  text-align: center;
+  font-size: 35pt;
+}
+
+.diff-msg {
+  text-align: center;
+  font-size: 9pt;
+  font-style: italic;
+}
+
+
+@media only screen and (max-width: 1700px) {
+  .diff-label {
+    font-size: 9pt;
+  }
+
+  .diff-value {
+    padding: 5px 0 5px 0;
+    font-size: 19pt;
+  }
+
+  .diff-msg {
+    font-size: 7pt;
+  }
+}
