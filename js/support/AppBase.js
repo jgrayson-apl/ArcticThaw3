@@ -14,7 +14,6 @@
  limitations under the License.
  */
 
-import AdobeAnalyticsUtils from "./AdobeAnalyticsUtils.js";
 import AppConfig from './AppConfig.js';
 
 class AppBase extends AppConfig {
@@ -59,9 +58,6 @@ class AppBase extends AppConfig {
    */
   constructor() {
     super();
-
-    // ADOBE ANALYTICS //
-    const analyticsUtils = new AdobeAnalyticsUtils({source: this});
 
     // APP NAME //
     const pathParts = location.pathname.split('/');
