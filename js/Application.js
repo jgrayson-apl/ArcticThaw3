@@ -152,7 +152,7 @@ class Application extends AppBase {
         this.initializeTrendCharts();
         this.initializeCountriesLayer({view});
         this.initializeNorthPole({view});
-        this.initializeArcticBorealZone({view});
+        //this.initializeArcticBorealZone({view});
         this.initializeTrendLayers({view}).then(({tempMeansTrendsLayer, frozenDaysTrendLayer}) => {
           this.initializeTrendOptions({view, tempMeansTrendsLayer, frozenDaysTrendLayer});
           this.initializeAnalysisLocation({view, tempMeansTrendsLayer, frozenDaysTrendLayer});
@@ -257,7 +257,7 @@ class Application extends AppBase {
    *
    * @param view
    */
-  initializeArcticBorealZone({view}) {
+  /*initializeArcticBorealZone({view}) {
     require(["esri/core/reactiveUtils"], (reactiveUtils) => {
       const transitionZoomLevel = 5.5;
 
@@ -275,7 +275,7 @@ class Application extends AppBase {
 
       });
     });
-  }
+  }*/
 
   /**
    *
