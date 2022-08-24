@@ -150,7 +150,7 @@ class Application extends AppBase {
       // VIEW READY //
       this.configView(view).then(() => {
         this.initializeTrendCharts();
-        this.initializeCountriesLayer({view});
+        //this.initializeCountriesLayer({view});
         this.initializeNorthPole({view});
         //this.initializeArcticBorealZone({view});
         this.initializeTrendLayers({view}).then(({tempMeansTrendsLayer, frozenDaysTrendLayer}) => {
@@ -245,15 +245,14 @@ class Application extends AppBase {
    *
    * @param view
    */
-  initializeCountriesLayer({view}) {
+  /*initializeCountriesLayer({view}) {
     const countriesLayer = view.map.allLayers.find(layer => { return (layer.title === "World Countries"); });
     countriesLayer.load().then(() => {
       countriesLayer.labelingInfo[0].labelPlacement = null;
     });
-  }
+  }*/
 
   /**
-   * Ocean Grids: #43abeb - #335072
    *
    * @param view
    */
