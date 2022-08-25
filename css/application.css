@@ -320,3 +320,16 @@ calcite-tabs {
     font-size: 7pt;
   }
 }
+
+
+#performanceInfo {
+  /*padding: 0.5em;*/
+}
+
+table {
+  margin: 0.5em 0;
+}
+
+.center {
+  text-align: center;
+}
