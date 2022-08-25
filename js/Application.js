@@ -359,21 +359,10 @@ class Application extends AppBase {
 
           // SAVE WEB SCENE //
           if (confirm("Are you sure you want to update the trend layer renderers in the Web Scene?")) {
-
-            require(['esri/identity/IdentityManager', 'esri/identity/OAuthInfo'], (esriId, OAuthInfo) => {
-              const oauthInfo = new OAuthInfo({
-                portalUrl: 'https://geoxc.maps.arcgis.com',
-                appId: 'Lx4TNs9Y38NhChOf',
-                popup: true
-              });
-              esriId.registerOAuthInfos([oauthInfo]);
-
-              view.map.updateFrom(view, {environmentExcluded: true}).then(() => {
-                view.map.save({ignoreUnsupported: true});
-              }).catch(error => {
-                this.displayError(error);
-              });
-
+            view.map.updateFrom(view, {environmentExcluded: true}).then(() => {
+              view.map.save({ignoreUnsupported: true});
+            }).catch(error => {
+              this.displayError(error);
             });
           }
 
