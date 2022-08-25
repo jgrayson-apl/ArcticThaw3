@@ -150,7 +150,7 @@ class Application extends AppBase {
       // VIEW READY //
       this.configView(view).then(() => {
         this.initializeTrendCharts();
-        //this.initializeCountriesLayer({view});
+        this.initializeCountriesLayer({view});
         this.initializeNorthPole({view});
         //this.initializeArcticBorealZone({view});
         this.initializeTrendLayers({view}).then(({tempMeansTrendsLayer, frozenDaysTrendLayer}) => {
@@ -245,12 +245,19 @@ class Application extends AppBase {
    *
    * @param view
    */
-  /*initializeCountriesLayer({view}) {
-   const countriesLayer = view.map.allLayers.find(layer => { return (layer.title === "World Countries"); });
-   countriesLayer.load().then(() => {
-   countriesLayer.labelingInfo[0].labelPlacement = null;
-   });
-   }*/
+  initializeCountriesLayer({view}) {
+
+    const countriesLabelLayer = view.map.allLayers.find(layer => { return (layer.title === "World Country Labels"); });
+    countriesLabelLayer.load().then(() => {
+
+      const labelsAction = document.getElementById('labels-action');
+      labelsAction.addEventListener('click', () => {
+        countriesLabelLayer.visible = labelsAction.toggleAttribute('active');
+      });
+
+    });
+
+  }
 
   /**
    *
@@ -352,10 +359,21 @@ class Application extends AppBase {
 
           // SAVE WEB SCENE //
           if (confirm("Are you sure you want to update the trend layer renderers in the Web Scene?")) {
-            view.map.updateFrom(view, {environmentExcluded: true}).then(() => {
-              view.map.save({ignoreUnsupported: true});
-            }).catch(error => {
-              this.displayError(error);
+
+            require(['esri/identity/IdentityManager', 'esri/identity/OAuthInfo'], (esriId, OAuthInfo) => {
+              const oauthInfo = new OAuthInfo({
+                portalUrl: 'https://geoxc.maps.arcgis.com',
+                appId: 'Lx4TNs9Y38NhChOf',
+                popup: true
+              });
+              esriId.registerOAuthInfos([oauthInfo]);
+
+              view.map.updateFrom(view, {environmentExcluded: true}).then(() => {
+                view.map.save({ignoreUnsupported: true});
+              }).catch(error => {
+                this.displayError(error);
+              });
+
             });
           }
 
