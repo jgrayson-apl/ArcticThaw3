@@ -246,35 +246,36 @@ class Application extends AppBase {
    * @param view
    */
   /*initializeCountriesLayer({view}) {
-    const countriesLayer = view.map.allLayers.find(layer => { return (layer.title === "World Countries"); });
-    countriesLayer.load().then(() => {
-      countriesLayer.labelingInfo[0].labelPlacement = null;
-    });
-  }*/
+   const countriesLayer = view.map.allLayers.find(layer => { return (layer.title === "World Countries"); });
+   countriesLayer.load().then(() => {
+   countriesLayer.labelingInfo[0].labelPlacement = null;
+   });
+   }*/
 
   /**
    *
    * @param view
    */
+
   /*initializeArcticBorealZone({view}) {
-    require(["esri/core/reactiveUtils"], (reactiveUtils) => {
-      const transitionZoomLevel = 5.5;
+   require(["esri/core/reactiveUtils"], (reactiveUtils) => {
+   const transitionZoomLevel = 5.5;
 
-      const abzGeneralizedLayer = view.map.allLayers.find(layer => { return (layer.title === "Arctic Boreal Zone - (generalized)"); });
-      const abzDetailedLayer = view.map.allLayers.find(layer => { return (layer.title === "Arctic Boreal Zone - (detailed)"); });
+   const abzGeneralizedLayer = view.map.allLayers.find(layer => { return (layer.title === "Arctic Boreal Zone - (generalized)"); });
+   const abzDetailedLayer = view.map.allLayers.find(layer => { return (layer.title === "Arctic Boreal Zone - (detailed)"); });
 
-      Promise.all([abzGeneralizedLayer.load(), abzDetailedLayer.load()]).then(() => {
-        reactiveUtils.watch(() => view.zoom, zoom => {
-          if (zoom < transitionZoomLevel) {
-            !abzGeneralizedLayer.visible && (abzGeneralizedLayer.visible = true);
-          } else {
-            !abzDetailedLayer.visible && (abzDetailedLayer.visible = true);
-          }
-        });
+   Promise.all([abzGeneralizedLayer.load(), abzDetailedLayer.load()]).then(() => {
+   reactiveUtils.watch(() => view.zoom, zoom => {
+   if (zoom < transitionZoomLevel) {
+   !abzGeneralizedLayer.visible && (abzGeneralizedLayer.visible = true);
+   } else {
+   !abzDetailedLayer.visible && (abzDetailedLayer.visible = true);
+   }
+   });
 
-      });
-    });
-  }*/
+   });
+   });
+   }*/
 
   /**
    *
@@ -294,6 +295,7 @@ class Application extends AppBase {
         frozenDaysTrendLayer.load()
       ]).then(([]) => {
 
+        // UPDATE TREND LAYERS AND SAVE RENDERING IN WEB SCENE //
         const updateTrendLayerRendering = () => {
 
           const blendMode = 'multiply';
@@ -306,8 +308,6 @@ class Application extends AppBase {
             renderingRule: null,
             renderer: {
               type: 'raster-stretch',
-              //stretchType: 'standard-deviation',
-              //numberOfStandardDeviations: 1.5,
               stretchType: 'min-max',
               statistics: [{
                 min: -0.04,
@@ -333,8 +333,6 @@ class Application extends AppBase {
             renderingRule: null,
             renderer: {
               type: 'raster-stretch',
-              // stretchType: 'standard-deviation',
-              // numberOfStandardDeviations: 1.5,
               stretchType: 'min-max',
               statistics: [{
                 min: -0.2,
@@ -353,24 +351,31 @@ class Application extends AppBase {
           });
 
           // SAVE WEB SCENE //
-          /*view.on('double-click', () => {
-           if (confirm("Are you sure you want to update the Trend layer renderers?")) {
-           view.map.updateFrom(view, {environmentExcluded: true}).then(() => {
-           view.map.save({ignoreUnsupported: true});
-           }).catch(error => {
-           this.displayError(error);
-           });
-           }
-           });*/
+          if (confirm("Are you sure you want to update the trend layer renderers in the Web Scene?")) {
+            view.map.updateFrom(view, {environmentExcluded: true}).then(() => {
+              view.map.save({ignoreUnsupported: true});
+            }).catch(error => {
+              this.displayError(error);
+            });
+          }
 
         };
 
-        /**
-         * NOTE: UNCOMMENT IF YOU'D LIKE TO APPLY RENDERERS DYNAMICALLY
-         *       AND ENABLE THE ABILITY TO SAVE/UPDATE THE WEB SCENE
-         *       WITH THESE NEW LAYER RENDERER SETTINGS.
-         */
-        //updateTrendLayerRendering();
+        // ENABLE ABILITY TO SAVE THE WEB SCENE //
+        if (this.saveMap === 'true') {
+          const mapSaveAction = document.getElementById('map-save-action');
+          mapSaveAction.toggleAttribute('hidden', false);
+          mapSaveAction.addEventListener('click', () => {
+
+            /**
+             * NOTE: APPLY RENDERERS DYNAMICALLY AND ENABLE THE
+             *       ABILITY TO SAVE/UPDATE THE WEB SCENE WITH
+             *       THESE NEW LAYER RENDERER SETTINGS.
+             */
+            updateTrendLayerRendering();
+          });
+
+        }
 
         resolve({tempMeansTrendsLayer, frozenDaysTrendLayer});
       }).catch(reject);
