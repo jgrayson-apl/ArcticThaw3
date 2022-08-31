@@ -179,6 +179,7 @@ class Application extends AppBase {
     };
 
     const title = document.getElementById("title");
+
     function updateMemoryTitle(used, total, quality) {
       title.innerHTML = `Memory: ${ getMB(used) }MB/${ getMB(total) }MB  -  Quality: ${ Math.round(100 * quality) } %`;
     }
@@ -372,23 +373,24 @@ class Application extends AppBase {
 
       const tempMeansTrendsLayer = view.map.allLayers.find(layer => { return (layer.title === "Temp Means Trends"); });
       const frozenDaysTrendLayer = view.map.allLayers.find(layer => { return (layer.title === "Frozen Days Trends"); });
-
       Promise.all([
         tempMeansTrendsLayer.load(),
         frozenDaysTrendLayer.load()
-      ]).then(([]) => {
+      ]).then(() => {
 
         // UPDATE TREND LAYERS AND SAVE RENDERING IN WEB SCENE //
         const updateTrendLayerRendering = () => {
 
-          const blendMode = 'multiply';
-
-          tempMeansTrendsLayer.set({
-            bandId: 2,
+          const defaultSettings = {
+            bandIds: [0],
             interpolation: 'bilinear',
-            blendMode: blendMode,
+            blendMode: 'multiply',
             opacity: 1.0,
             renderingRule: null,
+          };
+
+          tempMeansTrendsLayer.set({
+            ...defaultSettings,
             renderer: {
               type: 'raster-stretch',
               stretchType: 'min-max',
@@ -409,11 +411,7 @@ class Application extends AppBase {
           });
 
           frozenDaysTrendLayer.set({
-            bandId: 2,
-            interpolation: 'bilinear',
-            blendMode: blendMode,
-            opacity: 1.0,
-            renderingRule: null,
+            ...defaultSettings,
             renderer: {
               type: 'raster-stretch',
               stretchType: 'min-max',
@@ -457,7 +455,6 @@ class Application extends AppBase {
              */
             updateTrendLayerRendering();
           });
-
         }
 
         resolve({tempMeansTrendsLayer, frozenDaysTrendLayer});
