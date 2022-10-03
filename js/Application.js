@@ -154,6 +154,8 @@ class Application extends AppBase {
           this.displayPerformanceInfo({view});
         }
 
+        this.initialiseVisualization({view});
+
         this.initializeTrendCharts();
         this.initializeCountriesLayer({view});
         this.initializeNorthPole({view});
@@ -165,6 +167,23 @@ class Application extends AppBase {
         }).catch(reject);
       }).catch(reject);
     });
+  }
+
+  /**
+   *
+   * @param view
+   */
+  initialiseVisualization({view}){
+
+    const terrainBaseLayer = view.map.allLayers.find(layer => layer.title === "World Terrain Base");
+    terrainBaseLayer.load().then(() => {
+
+      /*terrainBaseLayer.set({
+        blendMode: 'luminosity'
+      });*/
+
+    });
+
   }
 
   /**
@@ -197,10 +216,8 @@ class Application extends AppBase {
     const tableCountContainer = document.getElementById("performance-count");
 
     function updateTables(stats) {
-      tableMemoryContainer.innerHTML = `<tr>
-            <th>Resource</th>
-            <th>Memory(MB)</th>
-          </tr>`;
+      tableMemoryContainer.innerHTML = `<tr><th>Resource</th><th>Memory(MB)</th></tr>`;
+
       for (const layerInfo of stats.layerPerformanceInfos) {
         const row = document.createElement("tr");
         row.innerHTML = `<td>${ layerInfo.layer.title }</td><td class="center">${ getMB(layerInfo.memory) }</td>`;
@@ -299,7 +316,8 @@ class Application extends AppBase {
         geometry: geometryEngine.geodesicBuffer(northPole, 560, 'kilometers'),
         symbol: {
           type: 'simple-fill',
-          color: 'rgba(204,234,251,0.85)',
+          //color: 'rgba(204,234,251,0.85)',
+          color: 'rgba(130,130,130,0.85)',
           outline: {color: 'rgba(151,180,203,0.45)', width: 1.0}
         }
       });
@@ -404,8 +422,8 @@ class Application extends AppBase {
               type: 'raster-stretch',
               stretchType: 'min-max',
               statistics: [{
-                min: -0.04,
-                max: 0.04,
+                min: -0.08, //0.04
+                max: 0.08,
                 avg: -0.24971247235947172,
                 stddev: 0.37222849013071047
               }],
@@ -425,8 +443,8 @@ class Application extends AppBase {
               type: 'raster-stretch',
               stretchType: 'min-max',
               statistics: [{
-                min: -0.2,
-                max: 0.2,
+                min: -0.4, // 0.2
+                max: 0.4,
                 avg: -0.24971247235947172,
                 stddev: 0.37222849013071047
               }],

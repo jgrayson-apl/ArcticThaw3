@@ -117,7 +117,8 @@ calcite-notice {
   margin: 0;
   width: 100%;
   height: 100%;
-  background: radial-gradient(#439bff, #2b2b2b); /* #34547c #439bff */
+  /*background: radial-gradient(#439bff, #2b2b2b); !* #34547c #439bff *!*/
+  background: radial-gradient(#535759, #2b2b2b ); /* #34547c #439bff */
 }
 
 #view-container:empty {
@@ -233,6 +234,14 @@ calcite-block.layer-block[active] {
 
 calcite-block[slot="control"] {
   height: 100%;
+}
+
+calcite-block.layer-block .trend-color-ramp {
+  opacity: 0.4;
+}
+
+calcite-block.layer-block[active] .trend-color-ramp {
+  opacity: 1.0;
 }
 
 calcite-radio-group-item {
