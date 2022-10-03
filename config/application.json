@@ -11,6 +11,7 @@
   "webscene": "eb9b1830d9a24937b69bca7876242059",
   "saveMap": false,
   "container": "view-container",
+  "performanceInfo": false,
   "viewConfig": {
     "alphaCompositingEnabled": true
   },

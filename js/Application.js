@@ -150,7 +150,9 @@ class Application extends AppBase {
       // VIEW READY //
       this.configView(view).then(() => {
 
-        this.displayPerformanceInfo({view});
+        if(this.performanceInfo) {
+          this.displayPerformanceInfo({view});
+        }
 
         this.initializeTrendCharts();
         this.initializeCountriesLayer({view});
@@ -165,7 +167,14 @@ class Application extends AppBase {
     });
   }
 
+  /**
+   *
+   * @param view
+   */
   displayPerformanceInfo({view}) {
+
+    const performanceInfoContainer = document.getElementById('performance-info-container');
+    performanceInfoContainer.toggleAttribute('hidden', false);
 
     const updatePerformanceInfo = () => {
       const performanceInfo = view.performanceInfo;
@@ -178,14 +187,14 @@ class Application extends AppBase {
       setTimeout(updatePerformanceInfo, 1000);
     };
 
-    const title = document.getElementById("title");
+    const title = document.getElementById("performance-title");
 
     function updateMemoryTitle(used, total, quality) {
       title.innerHTML = `Memory: ${ getMB(used) }MB/${ getMB(total) }MB  -  Quality: ${ Math.round(100 * quality) } %`;
     }
 
-    const tableMemoryContainer = document.getElementById("memory");
-    const tableCountContainer = document.getElementById("count");
+    const tableMemoryContainer = document.getElementById("performance-memory");
+    const tableCountContainer = document.getElementById("performance-count");
 
     function updateTables(stats) {
       tableMemoryContainer.innerHTML = `<tr>
@@ -625,8 +634,8 @@ class Application extends AppBase {
         const abzLabel = tempMeansIndicator.querySelector('.abz-section .diff-value');
         const locationLabel = tempMeansIndicator.querySelector('.location-section .diff-value');
         return (abzTrend, locationTrend) => {
-          abzLabel.innerHTML = abzTrend ? `${ degreeFormatter.format(abzTrend) }&deg;` : '--';
-          locationLabel.innerHTML = locationTrend ? `${ degreeFormatter.format(locationTrend) }&deg;` : '--';
+          abzLabel.innerHTML = abzTrend ? `${ degreeFormatter.format(abzTrend) }` : '--'; //&deg;
+          locationLabel.innerHTML = locationTrend ? `${ degreeFormatter.format(locationTrend) }` : '--';
         };
       };
 
