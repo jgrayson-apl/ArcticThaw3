@@ -249,3 +249,72 @@ require(["esri/Color"], (Color) => {
      };
 
      };*/
+
+
+/*
+       let viewClickHandle = null;
+       const enableMapSearch = enabled => {
+       if (enabled) {
+       this.clearSearchTerm();
+       viewClickHandle = view.on('click', this.setAnalysisLocation);
+       } else {
+       viewClickHandle && viewClickHandle.remove();
+       }
+       view.container.style.cursor = enabled ? 'crosshair' : 'default';
+       searchLocationBtn.setAttribute('icon-end', enabled ? 'check' : 'blank');
+       searchLocationBtn.setAttribute('color', enabled ? 'blue' : 'neutral');
+       };
+       const searchLocationBtn = document.getElementById('search-location-btn');
+       searchLocationBtn.addEventListener('click', () => {
+       const isActive = searchLocationBtn.toggleAttribute('active');
+       enableMapSearch(isActive);
+       });
+       */
+
+       /**
+          *
+          * @param view
+          */
+         /*initializeCountriesLayer({view}) {
+          const countriesLabelLayer = view.map.allLayers.find(layer => { return (layer.title === "World Country Labels"); });
+          countriesLabelLayer.load().then(() => {
+          const labelsAction = document.getElementById('labels-action');
+          labelsAction.addEventListener('click', () => {
+          countriesLabelLayer.visible = labelsAction.toggleAttribute('active');
+          });
+          });
+          }*/
+
+
+
+  /*initializeArcticBorealZone({view}) {
+   require(["esri/core/reactiveUtils"], (reactiveUtils) => {
+   const transitionZoomLevel = 5.5;
+
+   const abzGeneralizedLayer = view.map.allLayers.find(layer => { return (layer.title === "Arctic Boreal Zone - (generalized)"); });
+   const abzDetailedLayer = view.map.allLayers.find(layer => { return (layer.title === "Arctic Boreal Zone - (detailed)"); });
+
+   Promise.all([abzGeneralizedLayer.load(), abzDetailedLayer.load()]).then(() => {
+   reactiveUtils.watch(() => view.zoom, zoom => {
+   if (zoom < transitionZoomLevel) {
+   !abzGeneralizedLayer.visible && (abzGeneralizedLayer.visible = true);
+   } else {
+   !abzDetailedLayer.visible && (abzDetailedLayer.visible = true);
+   }
+   });
+
+   });
+   });
+   }*/
+
+
+   /*const tempMeansLayerToggles = document.querySelector(`.layer-toggle[layer="temp-means"]`);
+          const frozenDaysLayerToggles = document.querySelector(`.layer-toggle[layer="frozen-days"]`);
+          tempMeansLayerToggles.addEventListener('calciteSwitchChange', () => {
+          setActiveTrendLayer(tempMeansLayerToggles.checked ? 'temp-means' : 'frozen-days');
+          frozenDaysLayerToggles.checked = !tempMeansLayerToggles.checked;
+          });
+          frozenDaysLayerToggles.addEventListener('calciteSwitchChange', () => {
+          setActiveTrendLayer(frozenDaysLayerToggles.checked ? 'frozen-days' : 'temp-means');
+          tempMeansLayerToggles.checked = !frozenDaysLayerToggles.checked;
+          });*/

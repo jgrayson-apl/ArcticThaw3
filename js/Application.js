@@ -173,7 +173,9 @@ class Application extends AppBase {
           this.initializeRendererUpdates({view, tempMeansTrendsLayer, frozenDaysTrendLayer});
           this.initializeTrendOptions({view, tempMeansTrendsLayer, frozenDaysTrendLayer});
           this.initializeAnalysisLocation({view, tempMeansTrendsLayer, frozenDaysTrendLayer});
-          this.initializeIntroSlide({view}).then(resolve).catch(reject);
+          this.initializeViewSlides({view}).then(() => {
+            this.initiatePlaceSearch().then(resolve).catch(reject);
+          }).catch(reject);
         }).catch(reject);
       }).catch(reject);
     });
@@ -262,7 +264,7 @@ class Application extends AppBase {
    *
    * @param view
    */
-  initializeIntroSlide({view}) {
+  initializeViewSlides({view}) {
     return new Promise((resolve, reject) => {
       require([
         "esri/core/reactiveUtils",
@@ -283,7 +285,8 @@ class Application extends AppBase {
 
         // INITIAL INTRO SLIDE //
         slidesList.addEventListener('slides-ready', () => {
-          slidesList.goToSlide('North Pole', {duration: 5000}).then(resolve).catch(reject);
+          //slidesList.goToSlide('North Pole', {duration: 5000}).then(resolve).catch(reject);
+          resolve();
         });
 
       });
@@ -340,45 +343,6 @@ class Application extends AppBase {
 
   /**
    *
-   * @param view
-   */
-  /*initializeCountriesLayer({view}) {
-   const countriesLabelLayer = view.map.allLayers.find(layer => { return (layer.title === "World Country Labels"); });
-   countriesLabelLayer.load().then(() => {
-   const labelsAction = document.getElementById('labels-action');
-   labelsAction.addEventListener('click', () => {
-   countriesLabelLayer.visible = labelsAction.toggleAttribute('active');
-   });
-   });
-   }*/
-
-  /**
-   *
-   * @param view
-   */
-
-  /*initializeArcticBorealZone({view}) {
-   require(["esri/core/reactiveUtils"], (reactiveUtils) => {
-   const transitionZoomLevel = 5.5;
-
-   const abzGeneralizedLayer = view.map.allLayers.find(layer => { return (layer.title === "Arctic Boreal Zone - (generalized)"); });
-   const abzDetailedLayer = view.map.allLayers.find(layer => { return (layer.title === "Arctic Boreal Zone - (detailed)"); });
-
-   Promise.all([abzGeneralizedLayer.load(), abzDetailedLayer.load()]).then(() => {
-   reactiveUtils.watch(() => view.zoom, zoom => {
-   if (zoom < transitionZoomLevel) {
-   !abzGeneralizedLayer.visible && (abzGeneralizedLayer.visible = true);
-   } else {
-   !abzDetailedLayer.visible && (abzDetailedLayer.visible = true);
-   }
-   });
-
-   });
-   });
-   }*/
-
-  /**
-   *
    * https://developers.arcgis.com/javascript/latest/api-reference/esri-renderers-RasterStretchRenderer.html
    *
    * @param {SceneView} view
@@ -399,22 +363,14 @@ class Application extends AppBase {
           const mapSaveAction = document.getElementById('map-save-action');
           mapSaveAction.toggleAttribute('hidden', false);
           mapSaveAction.addEventListener('click', () => {
-
             // SAVE WEB SCENE //
-            if (confirm("Are you sure you want to update the trend layer renderers in the Web Scene?")) {
+            if (confirm("Are you sure you want to update and save the Web Scene?")) {
               view.map.updateFrom(view, {environmentExcluded: true}).then(() => {
                 view.map.save({ignoreUnsupported: true});
               }).catch(error => {
                 this.displayError(error);
               });
             }
-
-            /**
-             * NOTE: APPLY RENDERERS DYNAMICALLY AND ENABLE THE
-             *       ABILITY TO SAVE/UPDATE THE WEB SCENE WITH
-             *       THESE NEW LAYER RENDERER SETTINGS.
-             */
-            //updateTrendLayerRendering();
           });
         }
 
@@ -594,17 +550,6 @@ class Application extends AppBase {
         setActiveTrendLayer(detail);
       });
 
-      /*const tempMeansLayerToggles = document.querySelector(`.layer-toggle[layer="temp-means"]`);
-       const frozenDaysLayerToggles = document.querySelector(`.layer-toggle[layer="frozen-days"]`);
-       tempMeansLayerToggles.addEventListener('calciteSwitchChange', () => {
-       setActiveTrendLayer(tempMeansLayerToggles.checked ? 'temp-means' : 'frozen-days');
-       frozenDaysLayerToggles.checked = !tempMeansLayerToggles.checked;
-       });
-       frozenDaysLayerToggles.addEventListener('calciteSwitchChange', () => {
-       setActiveTrendLayer(frozenDaysLayerToggles.checked ? 'frozen-days' : 'temp-means');
-       tempMeansLayerToggles.checked = !frozenDaysLayerToggles.checked;
-       });*/
-
     });
   }
 
@@ -731,7 +676,6 @@ class Application extends AppBase {
         analysisLocationCoordinatesInput.value = null;
         updateLocationGraphic();
         updateLocationTrendAnalysis();
-        enableMapSearch(false);
         this.clearSearchTerm();
         this.dispatchEvent(new CustomEvent('location-change', {detail: {location: _mapPoint}}));
       };
@@ -777,26 +721,6 @@ class Application extends AppBase {
       view.container.style.cursor = 'pointer';
       view.on('click', this.setAnalysisLocation);
 
-      /*
-       let viewClickHandle = null;
-       const enableMapSearch = enabled => {
-       if (enabled) {
-       this.clearSearchTerm();
-       viewClickHandle = view.on('click', this.setAnalysisLocation);
-       } else {
-       viewClickHandle && viewClickHandle.remove();
-       }
-       view.container.style.cursor = enabled ? 'crosshair' : 'default';
-       searchLocationBtn.setAttribute('icon-end', enabled ? 'check' : 'blank');
-       searchLocationBtn.setAttribute('color', enabled ? 'blue' : 'neutral');
-       };
-       const searchLocationBtn = document.getElementById('search-location-btn');
-       searchLocationBtn.addEventListener('click', () => {
-       const isActive = searchLocationBtn.toggleAttribute('active');
-       enableMapSearch(isActive);
-       });
-       */
-
       // SEARCH /
       const search = new Search({
         container: 'search-container',
@@ -807,7 +731,7 @@ class Application extends AppBase {
         allPlaceholder: "Find place",
         searchTerm: this.place || '',
         goToOverride: (view, goToParams) => {
-          return view.goTo({...goToParams.target, scale: view.scale});
+          return view.goTo({...goToParams.target, scale: view.scale}, {duration: 5000});
         }
       });
       search.on('select-result', ({result: {feature}}) => {
@@ -815,6 +739,16 @@ class Application extends AppBase {
       });
       this.clearSearchTerm = () => {
         search.searchTerm = null;
+      };
+
+      // ALLOW OTHER PARTS OF THE APP TO INITIATE A PLACE SEARCH //
+      // NOTE: CURRENTLY HAPPENS AFTER INITIAL ANIMATION //
+      this.initiatePlaceSearch = () => {
+        return new Promise((resolve, reject) => {
+          if (search.searchTerm) {
+            search.search(search.searchTerm).then(resolve).catch(reject);
+          } else { resolve(); }
+        });
       };
 
       const analysisLocationCoordinatesClearBtn = document.getElementById('analysis-location-coordinates-clear-btn');
@@ -867,8 +801,14 @@ class Application extends AppBase {
           pointStyle: 'line',
           usePointStyle: true,
           color: '#efefef',
-          filter: (item, data) => {
-            return data.datasets.length;
+          generateLabels: (chart) => {
+            return Chart.defaults.plugins.legend.labels.generateLabels(chart).map(item => {
+              return (item.datasetIndex === 0) ? item : {
+                text: item.text,
+                pointStyle: 'rect',
+                strokeStyle: '#fefefe'
+              };
+            });
           }
         }
       };
@@ -895,7 +835,7 @@ class Application extends AppBase {
           plugins: {
             title: {
               ...defaultTitle,
-              text: 'Air Temperature'
+              text: 'Air Temperature Trends'
             },
             legend: defaultLegend
           },
@@ -905,7 +845,7 @@ class Application extends AppBase {
               display: true,
               title: {
                 display: true,
-                text: 'Temperature °C per Decade',
+                text: '°C per Decade',
                 color: '#efefef',
                 font: {size: 11}
               },
@@ -954,7 +894,7 @@ class Application extends AppBase {
           plugins: {
             title: {
               ...defaultTitle,
-              text: 'Days with Frozen Ground'
+              text: 'Days with Frozen Ground Trends'
             },
             legend: defaultLegend
           },
@@ -964,7 +904,7 @@ class Application extends AppBase {
               display: true,
               title: {
                 display: true,
-                text: 'Frozen Days per Decade',
+                text: 'Days per Decade',
                 color: '#efefef',
                 font: {size: 11}
               },
@@ -1013,12 +953,12 @@ class Application extends AppBase {
           if (trendInfo.slope != null) {
 
             const isCurrentDuration = (trendInfo.duration === duration);
-            const borderWidth = isCurrentDuration ? 1.8 : 1.2;
+            const borderWidth = isCurrentDuration ? 2.2 : 1.2;
 
             const trendColor = new Color((trendInfo.slope < 0.0) ? decreaseColor : increaseColor);
-            const borderColor = new Color(isCurrentDuration ? '#cccccc' : trendColor);
+            const borderColor = new Color(isCurrentDuration ? '#fefefe' : trendColor);
             const backgroundColor = trendColor.clone();
-            backgroundColor.a = isCurrentDuration ? 1.0 : 0.5;
+            backgroundColor.a = isCurrentDuration ? 1.0 : 0.4;
 
             infos.borderWidth.push(borderWidth);
             infos.borderColor.push(borderColor.toCss(true));
@@ -1039,7 +979,7 @@ class Application extends AppBase {
         if (tempMeansTrends) {
           let duration = this.getDuration();
           const dataset = createTrendDataset(tempMeansTrends, duration, this.WOODWELL_COLORS.blue, this.WOODWELL_COLORS.red, []);
-          tempMeansChart.data.datasets[1] = {...defaultDataset, ...dataset, label: 'Temperature'};
+          tempMeansChart.data.datasets[1] = {...defaultDataset, ...dataset, label: 'Analysis Location'};
         } else {
           tempMeansChart.data.datasets[1] = null;
         }
@@ -1050,7 +990,7 @@ class Application extends AppBase {
         if (frozenDaysTrends) {
           let duration = this.getDuration();
           const dataset = createTrendDataset(frozenDaysTrends, duration, this.WOODWELL_COLORS.red, this.WOODWELL_COLORS.blue, [null, null]);
-          frozenDaysChart.data.datasets[1] = {...defaultDataset, ...dataset, label: 'Frozen Days'};
+          frozenDaysChart.data.datasets[1] = {...defaultDataset, ...dataset, label: 'Analysis Location'};
         } else {
           frozenDaysChart.data.datasets[1] = null;
         }
