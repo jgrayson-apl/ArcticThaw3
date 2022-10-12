@@ -284,11 +284,8 @@ calcite-tabs {
 }
 
 .esri-search {
-  padding: 0 25px 0 25px;
+  /*padding: 0 5px 0 5px;*/
   width: auto;
-  left: 0;
-  right: 0;
-  position: absolute;
 }
 
 .esri-search__suggestions-menu {

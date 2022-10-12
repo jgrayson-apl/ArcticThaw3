@@ -150,17 +150,16 @@ class Application extends AppBase {
       // VIEW READY //
       this.configView(view).then(() => {
 
-        if(this.performanceInfo) {
+        if (this.performanceInfo) {
           this.displayPerformanceInfo({view});
         }
 
-        this.initialiseVisualization({view});
-
         this.initializeTrendCharts();
-        this.initializeCountriesLayer({view});
+        //this.initializeCountriesLayer({view});
         this.initializeNorthPole({view});
         //this.initializeArcticBorealZone({view});
         this.initializeTrendLayers({view}).then(({tempMeansTrendsLayer, frozenDaysTrendLayer}) => {
+          this.initializeRendererUpdates({view, tempMeansTrendsLayer, frozenDaysTrendLayer});
           this.initializeTrendOptions({view, tempMeansTrendsLayer, frozenDaysTrendLayer});
           this.initializeAnalysisLocation({view, tempMeansTrendsLayer, frozenDaysTrendLayer});
           this.initializeIntroSlide({view}).then(resolve).catch(reject);
@@ -173,27 +172,10 @@ class Application extends AppBase {
    *
    * @param view
    */
-  initialiseVisualization({view}){
-
-    const terrainBaseLayer = view.map.allLayers.find(layer => layer.title === "World Terrain Base");
-    terrainBaseLayer.load().then(() => {
-
-      /*terrainBaseLayer.set({
-        blendMode: 'luminosity'
-      });*/
-
-    });
-
-  }
-
-  /**
-   *
-   * @param view
-   */
   displayPerformanceInfo({view}) {
 
-    const performanceInfoContainer = document.getElementById('performance-info-container');
-    performanceInfoContainer.toggleAttribute('hidden', false);
+    const performanceAction = document.getElementById('performance-action');
+    performanceAction.toggleAttribute('hidden', false);
 
     const updatePerformanceInfo = () => {
       const performanceInfo = view.performanceInfo;
@@ -349,19 +331,15 @@ class Application extends AppBase {
    *
    * @param view
    */
-  initializeCountriesLayer({view}) {
-
+  /*initializeCountriesLayer({view}) {
     const countriesLabelLayer = view.map.allLayers.find(layer => { return (layer.title === "World Country Labels"); });
     countriesLabelLayer.load().then(() => {
-
       const labelsAction = document.getElementById('labels-action');
       labelsAction.addEventListener('click', () => {
         countriesLabelLayer.visible = labelsAction.toggleAttribute('active');
       });
-
     });
-
-  }
+  }*/
 
   /**
    *
@@ -405,87 +383,114 @@ class Application extends AppBase {
         frozenDaysTrendLayer.load()
       ]).then(() => {
 
-        // UPDATE TREND LAYERS AND SAVE RENDERING IN WEB SCENE //
-        const updateTrendLayerRendering = () => {
-
-          const defaultSettings = {
-            bandIds: [0],
-            interpolation: 'bilinear',
-            blendMode: 'multiply',
-            opacity: 1.0,
-            renderingRule: null,
-          };
-
-          tempMeansTrendsLayer.set({
-            ...defaultSettings,
-            renderer: {
-              type: 'raster-stretch',
-              stretchType: 'min-max',
-              statistics: [{
-                min: -0.08, //0.04
-                max: 0.08,
-                avg: -0.24971247235947172,
-                stddev: 0.37222849013071047
-              }],
-              colorRamp: {
-                type: 'multipart',
-                colorRamps: [
-                  {algorithm: 'hsv', fromColor: this.WOODWELL_COLORS.blue, toColor: this.WOODWELL_COLORS.white},
-                  {algorithm: 'hsv', fromColor: this.WOODWELL_COLORS.white, toColor: this.WOODWELL_COLORS.red}
-                ]
-              }
-            }
-          });
-
-          frozenDaysTrendLayer.set({
-            ...defaultSettings,
-            renderer: {
-              type: 'raster-stretch',
-              stretchType: 'min-max',
-              statistics: [{
-                min: -0.4, // 0.2
-                max: 0.4,
-                avg: -0.24971247235947172,
-                stddev: 0.37222849013071047
-              }],
-              colorRamp: {
-                type: 'multipart',
-                colorRamps: [
-                  {algorithm: 'hsv', fromColor: this.WOODWELL_COLORS.red, toColor: this.WOODWELL_COLORS.white},
-                  {algorithm: 'hsv', fromColor: this.WOODWELL_COLORS.white, toColor: this.WOODWELL_COLORS.blue}
-                ]
-              }
-            }
-          });
-
-          // SAVE WEB SCENE //
-          if (confirm("Are you sure you want to update the trend layer renderers in the Web Scene?")) {
-            view.map.updateFrom(view, {environmentExcluded: true}).then(() => {
-              view.map.save({ignoreUnsupported: true});
-            }).catch(error => {
-              this.displayError(error);
-            });
-          }
-
-        };
-
         // ENABLE ABILITY TO SAVE THE WEB SCENE //
         if (this.saveMap === 'true') {
           const mapSaveAction = document.getElementById('map-save-action');
           mapSaveAction.toggleAttribute('hidden', false);
           mapSaveAction.addEventListener('click', () => {
 
+            // SAVE WEB SCENE //
+            if (confirm("Are you sure you want to update the trend layer renderers in the Web Scene?")) {
+              view.map.updateFrom(view, {environmentExcluded: true}).then(() => {
+                view.map.save({ignoreUnsupported: true});
+              }).catch(error => {
+                this.displayError(error);
+              });
+            }
+
             /**
              * NOTE: APPLY RENDERERS DYNAMICALLY AND ENABLE THE
              *       ABILITY TO SAVE/UPDATE THE WEB SCENE WITH
              *       THESE NEW LAYER RENDERER SETTINGS.
              */
-            updateTrendLayerRendering();
+            //updateTrendLayerRendering();
           });
         }
 
         resolve({tempMeansTrendsLayer, frozenDaysTrendLayer});
       }).catch(reject);
+    });
+
+  }
+
+  /**
+   *
+   * @param view
+   * @param tempMeansTrendsLayer
+   * @param frozenDaysTrendLayer
+   */
+  initializeRendererUpdates({view, tempMeansTrendsLayer, frozenDaysTrendLayer}) {
+
+    // UPDATE TREND LAYERS AND SAVE RENDERING IN WEB SCENE //
+    const _updateTrendLayerRendering = ({tempMeansMinMax, frozenDaysMinMax}) => {
+
+      const defaultSettings = {
+        bandIds: [0],
+        interpolation: 'bilinear',
+        blendMode: 'multiply',
+        opacity: 1.0,
+        renderingRule: null
+      };
+
+      tempMeansTrendsLayer.set({
+        ...defaultSettings,
+        renderer: {
+          type: 'raster-stretch',
+          stretchType: 'min-max',
+          statistics: [{
+            min: -tempMeansMinMax,
+            max: tempMeansMinMax,
+            avg: -0.24971247235947172,
+            stddev: 0.37222849013071047
+          }],
+          colorRamp: {
+            type: 'multipart',
+            colorRamps: [
+              {algorithm: 'hsv', fromColor: this.WOODWELL_COLORS.blue, toColor: this.WOODWELL_COLORS.white},
+              {algorithm: 'hsv', fromColor: this.WOODWELL_COLORS.white, toColor: this.WOODWELL_COLORS.red}
+            ]
+          }
+        }
+      });
+
+      frozenDaysTrendLayer.set({
+        ...defaultSettings,
+        renderer: {
+          type: 'raster-stretch',
+          stretchType: 'min-max',
+          statistics: [{
+            min: -frozenDaysMinMax,
+            max: frozenDaysMinMax,
+            avg: -0.24971247235947172,
+            stddev: 0.37222849013071047
+          }],
+          colorRamp: {
+            type: 'multipart',
+            colorRamps: [
+              {algorithm: 'hsv', fromColor: this.WOODWELL_COLORS.red, toColor: this.WOODWELL_COLORS.white},
+              {algorithm: 'hsv', fromColor: this.WOODWELL_COLORS.white, toColor: this.WOODWELL_COLORS.blue}
+            ]
+          }
+        }
+      });
+
+    };
+
+    const tempMeansRenderer = document.getElementById('temp-means-renderer');
+    tempMeansRenderer.value = 0.08;
+    tempMeansRenderer.addEventListener('calciteSliderInput', () => {
+      _updateTrendLayerRendering({
+        tempMeansMinMax: tempMeansRenderer.value,
+        frozenDaysMinMax: frozenDaysRenderer.value
+      });
+    });
+    const frozenDaysRenderer = document.getElementById('frozen-days-renderer');
+    frozenDaysRenderer.value = 0.80;
+    frozenDaysRenderer.addEventListener('calciteSliderInput', () => {
+      _updateTrendLayerRendering({
+        tempMeansMinMax: tempMeansRenderer.value,
+        frozenDaysMinMax: frozenDaysRenderer.value
+      });
     });
 
   }
@@ -680,7 +685,7 @@ class Application extends AppBase {
         //console.info(getDataResults);
 
         const abzTrend = getDataResults ? arcticBorealZoneTrends[indicator][getDataResults.startYear] : null;
-        const locationTrend = getDataResults?.slope;
+        const locationTrend = (getDataResults?.slope * 10);
 
         switch (indicator) {
           case 'temp-means':
@@ -758,6 +763,10 @@ class Application extends AppBase {
       };
 
       // USER VIEW CLICK //
+      view.container.style.cursor = 'pointer';
+      view.on('click', this.setAnalysisLocation);
+
+      /*
       let viewClickHandle = null;
       const enableMapSearch = enabled => {
         if (enabled) {
@@ -770,12 +779,12 @@ class Application extends AppBase {
         searchLocationBtn.setAttribute('icon-end', enabled ? 'check' : 'blank');
         searchLocationBtn.setAttribute('color', enabled ? 'blue' : 'neutral');
       };
-
       const searchLocationBtn = document.getElementById('search-location-btn');
       searchLocationBtn.addEventListener('click', () => {
         const isActive = searchLocationBtn.toggleAttribute('active');
         enableMapSearch(isActive);
       });
+      */
 
       // SEARCH /
       const search = new Search({
