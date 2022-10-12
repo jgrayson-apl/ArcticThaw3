@@ -819,6 +819,7 @@ class Application extends AppBase {
       };
 
       const defaultDataset = {
+        label: 'Analysis Location',
         type: 'bar',
         barThickness: 'flex'
       };
@@ -979,7 +980,7 @@ class Application extends AppBase {
         if (tempMeansTrends) {
           let duration = this.getDuration();
           const dataset = createTrendDataset(tempMeansTrends, duration, this.WOODWELL_COLORS.blue, this.WOODWELL_COLORS.red, []);
-          tempMeansChart.data.datasets[1] = {...defaultDataset, ...dataset, label: 'Analysis Location'};
+          tempMeansChart.data.datasets[1] = {...defaultDataset, ...dataset};
         } else {
           tempMeansChart.data.datasets[1] = null;
         }
@@ -990,7 +991,7 @@ class Application extends AppBase {
         if (frozenDaysTrends) {
           let duration = this.getDuration();
           const dataset = createTrendDataset(frozenDaysTrends, duration, this.WOODWELL_COLORS.red, this.WOODWELL_COLORS.blue, [null, null]);
-          frozenDaysChart.data.datasets[1] = {...defaultDataset, ...dataset, label: 'Analysis Location'};
+          frozenDaysChart.data.datasets[1] = {...defaultDataset, ...dataset};
         } else {
           frozenDaysChart.data.datasets[1] = null;
         }
