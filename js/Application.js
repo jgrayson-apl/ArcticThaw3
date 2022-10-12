@@ -130,6 +130,17 @@ class Application extends AppBase {
             (!this.disableViewUpdating) && viewUpdating.toggleAttribute('active', updating);
           });
 
+          // VIEW SCALEBAR //
+          const scalebarMinScale = this.scalebarMinScale;
+          const scaleFormatter = new Intl.NumberFormat('default', {minimumFractionDigits: 0, maximumFractionDigits: 0});
+          const scalebarNode = document.createElement('div');
+          scalebarNode.classList.add('esri-widget', 'scalebar-node');
+          reactiveUtils.watch(() => view.scale, (scale) => {
+            scalebarNode.innerHTML = `1 : ${ scaleFormatter.format(scale) }`;
+            scalebarNode.toggleAttribute('hidden', (scale > scalebarMinScale));
+          });
+          view.ui.add(scalebarNode, 'bottom-left');
+
           resolve();
         });
       } else { resolve(); }
@@ -332,14 +343,14 @@ class Application extends AppBase {
    * @param view
    */
   /*initializeCountriesLayer({view}) {
-    const countriesLabelLayer = view.map.allLayers.find(layer => { return (layer.title === "World Country Labels"); });
-    countriesLabelLayer.load().then(() => {
-      const labelsAction = document.getElementById('labels-action');
-      labelsAction.addEventListener('click', () => {
-        countriesLabelLayer.visible = labelsAction.toggleAttribute('active');
-      });
-    });
-  }*/
+   const countriesLabelLayer = view.map.allLayers.find(layer => { return (layer.title === "World Country Labels"); });
+   countriesLabelLayer.load().then(() => {
+   const labelsAction = document.getElementById('labels-action');
+   labelsAction.addEventListener('click', () => {
+   countriesLabelLayer.visible = labelsAction.toggleAttribute('active');
+   });
+   });
+   }*/
 
   /**
    *
@@ -767,24 +778,24 @@ class Application extends AppBase {
       view.on('click', this.setAnalysisLocation);
 
       /*
-      let viewClickHandle = null;
-      const enableMapSearch = enabled => {
-        if (enabled) {
-          this.clearSearchTerm();
-          viewClickHandle = view.on('click', this.setAnalysisLocation);
-        } else {
-          viewClickHandle && viewClickHandle.remove();
-        }
-        view.container.style.cursor = enabled ? 'crosshair' : 'default';
-        searchLocationBtn.setAttribute('icon-end', enabled ? 'check' : 'blank');
-        searchLocationBtn.setAttribute('color', enabled ? 'blue' : 'neutral');
-      };
-      const searchLocationBtn = document.getElementById('search-location-btn');
-      searchLocationBtn.addEventListener('click', () => {
-        const isActive = searchLocationBtn.toggleAttribute('active');
-        enableMapSearch(isActive);
-      });
-      */
+       let viewClickHandle = null;
+       const enableMapSearch = enabled => {
+       if (enabled) {
+       this.clearSearchTerm();
+       viewClickHandle = view.on('click', this.setAnalysisLocation);
+       } else {
+       viewClickHandle && viewClickHandle.remove();
+       }
+       view.container.style.cursor = enabled ? 'crosshair' : 'default';
+       searchLocationBtn.setAttribute('icon-end', enabled ? 'check' : 'blank');
+       searchLocationBtn.setAttribute('color', enabled ? 'blue' : 'neutral');
+       };
+       const searchLocationBtn = document.getElementById('search-location-btn');
+       searchLocationBtn.addEventListener('click', () => {
+       const isActive = searchLocationBtn.toggleAttribute('active');
+       enableMapSearch(isActive);
+       });
+       */
 
       // SEARCH /
       const search = new Search({

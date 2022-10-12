@@ -10,9 +10,10 @@
   "group": "",
   "webmap": "",
   "webscene": "eb9b1830d9a24937b69bca7876242059",
-  "saveMap": false,
   "container": "view-container",
+  "saveMap": false,
   "performanceInfo": false,
+  "scalebarMinScale": 1000000,
   "viewConfig": {
     "alphaCompositingEnabled": true
   },
