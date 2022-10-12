@@ -1,0 +1,251 @@
+/**
+ *
+ */
+initializeTrendCharts_OLD() {
+require(["esri/Color"], (Color) => {
+
+  Chart.defaults.font.family = 'Avenir Next LT Pro';
+
+  const defaultTitle = {
+    display: true, color: '#efefef', font: {weight: 'normal', size: 15}
+  };
+
+  const defaultLegend = {
+    display: true, onClick: null, labels: {
+      pointStyle: 'line', usePointStyle: true, color: '#efefef', filter: (item, data) => {
+        return data.datasets.length;
+      }
+    }
+  };
+
+  const defaultGridLines = {
+    color: '#666666', drawBorder: true
+  };
+
+  const defaultDataset = {
+    fill: false, borderWidth: 1.5
+  };
+
+  const tempMeansTrendChartNode = document.getElementById('temp-means-trend-chart');
+  const tempMeansChart = new Chart(tempMeansTrendChartNode, {
+    type: 'line',
+    data: {
+      datasets: []
+    },
+    options: {
+      animations: false,
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        title: {
+          ...defaultTitle,
+          text: 'Air Temperature'
+        },
+        legend: defaultLegend
+      },
+      scales: {
+        y: {
+          type: "linear",
+          display: true,
+          title: {
+            display: true,
+            text: 'Temperature °C',
+            color: '#efefef',
+            font: {size: 11}
+          },
+          ticks: {
+            padding: 5,
+            precision: 0,
+            stepSize: 1,
+            color: '#efefef',
+            callback: (value, index, values) => {
+              return `${ value.toFixed(1) }°`;
+            }
+          },
+          grid: defaultGridLines
+        },
+        x: {
+          type: 'linear',
+          position: 'bottom',
+          min: 1950,
+          max: 2020,
+          title: {
+            display: true,
+            text: 'Trend Duration',
+            color: '#efefef',
+            font: {size: 12}
+          },
+          ticks: {
+            padding: 5,
+            stepSize: 10,
+            color: '#efefef',
+            font: {size: 11},
+            callback: (value) => {
+              return value.toFixed(0);
+            }
+          },
+          grid: defaultGridLines
+        }
+      }
+    }
+  });
+
+  const frozenDaysTrendChartNode = document.getElementById('frozen-days-trend-chart');
+  const frozenDaysChart = new Chart(frozenDaysTrendChartNode, {
+    type: 'line',
+    data: {
+      datasets: []
+    },
+    options: {
+      animations: false,
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        title: {
+          ...defaultTitle,
+          text: 'Days with Frozen Ground'
+        },
+        legend: defaultLegend
+      },
+      scales: {
+        y: {
+          type: "linear",
+          display: true,
+          title: {
+            display: true,
+            text: 'Frozen Days',
+            color: '#efefef',
+            font: {size: 11}
+          },
+          ticks: {
+            padding: 5,
+            precision: 0,
+            stepSize: 30,
+            color: '#efefef'
+          },
+          grid: defaultGridLines
+        },
+        x: {
+          type: 'linear',
+          position: 'bottom',
+          title: {
+            display: true,
+            text: 'Trend Duration',
+            color: '#efefef',
+            font: {size: 12}
+          },
+          min: 1950,
+          max: 2020,
+          ticks: {
+            padding: 5,
+            stepSize: 10,
+            color: '#efefef',
+            font: {size: 11},
+            callback: (value) => {
+              return value.toFixed(0);
+            }
+          },
+          grid: defaultGridLines
+        }
+      }
+    }
+  });
+
+  const createTrendDataset = (trendInfo, duration, decreaseColor, increaseColor) => {
+
+    const isCurrentDuration = (trendInfo.duration === duration);
+    const trendColor = new Color((trendInfo.slope > 0) ? increaseColor : decreaseColor);
+    trendColor.a = isCurrentDuration ? 1.0 : 0.6;
+    const borderWidth = isCurrentDuration ? 2.0 : 1.0;
+    const borderColor = trendColor.toCss(true);
+    const pointRadius = isCurrentDuration ? 5.0 : 2.0;
+    const pointBackgroundColor = isCurrentDuration ? this.WOODWELL_COLORS.white : trendColor.toCss(true);
+    const pointBorderColor = trendColor.toCss(true);
+
+    return {
+      ...defaultDataset,
+      borderColor,
+      borderWidth,
+      pointRadius,
+      pointBorderColor,
+      pointBackgroundColor,
+      label: `${ trendInfo.duration } yrs`,
+      data: [
+        {x: trendInfo.startYear, y: trendInfo.start},
+        {x: trendInfo.endYear, y: trendInfo.end}
+      ]
+    };
+
+  };
+
+  this.addEventListener('temp-means-trends-change', ({detail: {tempMeansTrends}}) => {
+    let duration = this.getDuration();
+    if (tempMeansTrends) {
+      //tempMeansChart.options.plugins.title.text = `Air Temperature - ${ duration } years`;
+      tempMeansChart.data.datasets = tempMeansTrends.filter(tempMeansTrend => {
+        return (tempMeansTrend.slope != null);
+      }).map(tempMeansTrend => {
+        return createTrendDataset(tempMeansTrend, duration, this.WOODWELL_COLORS.blue, this.WOODWELL_COLORS.red);
+      });
+      tempMeansChart.update();
+    } else {
+      //tempMeansChart.options.plugins.title.text = `Air Temperature`;
+      tempMeansChart.data.datasets = [];
+      tempMeansChart.update();
+    }
+  });
+
+  this.addEventListener('frozen-days-trends-change', ({detail: {frozenDaysTrends}}) => {
+    let duration = this.getDuration();
+    if (frozenDaysTrends) {
+      //frozenDaysChart.options.plugins.title.text = `Days with Frozen Ground - ${ duration } years`;
+      frozenDaysChart.data.datasets = frozenDaysTrends.filter(frozenDaysTrend => {
+        return (frozenDaysTrend.slope != null);
+      }).map(frozenDaysTrend => {
+        return createTrendDataset(frozenDaysTrend, duration, this.WOODWELL_COLORS.red, this.WOODWELL_COLORS.blue);
+      });
+      frozenDaysChart.update();
+    } else {
+      //frozenDaysChart.options.plugins.title.text = `Days with Frozen Ground`;
+      frozenDaysChart.data.datasets = [];
+      frozenDaysChart.update();
+    }
+  });
+
+});
+}
+
+/*const createTrendDataset = (trendInfo, duration, decreaseColor, increaseColor) => {
+
+     const isCurrentDuration = (trendInfo.duration === duration);
+     const trendColor = new Color((trendInfo.slope > 0) ? increaseColor : decreaseColor);
+     trendColor.a = isCurrentDuration ? 1.0 : 0.4;
+
+     const borderWidth = isCurrentDuration ? 2.0 : 1.0;
+     const borderColor = trendColor.toCss(true);
+     const backgroundColor = trendColor.toCss(true);
+
+     // const pointRadius = isCurrentDuration ? 5.0 : 2.0;
+     // const pointBackgroundColor = isCurrentDuration ? this.WOODWELL_COLORS.white : trendColor.toCss(true);
+     // const pointBorderColor = trendColor.toCss(true);
+
+     return {
+     //...defaultDataset,
+     borderColor,
+     backgroundColor,
+     borderWidth,
+     // pointRadius,
+     // pointBorderColor,
+     // pointBackgroundColor,
+     label: `${ trendInfo.duration } yrs`,
+     // labels:["20","30","40","50","60"],
+     data: [
+     {x: trendInfo.duration, y: trendInfo.slope * 10}
+     ]
+     /!*data: [
+     {x: trendInfo.startYear, y: trendInfo.start},
+     {x: trendInfo.endYear, y: trendInfo.end}
+     ]*!/
+     };
+
+     };*/

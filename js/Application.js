@@ -695,7 +695,7 @@ class Application extends AppBase {
       const setTrendIndicator = (indicator, getDataResults) => {
         //console.info(getDataResults);
 
-        const abzTrend = getDataResults ? arcticBorealZoneTrends[indicator][getDataResults.startYear] : null;
+        const abzTrend = getDataResults ? arcticBorealZoneTrends[indicator][getDataResults.duration] : null;
         const locationTrend = (getDataResults?.slope * 10);
 
         switch (indicator) {
@@ -833,31 +833,60 @@ class Application extends AppBase {
 
       Chart.defaults.font.family = 'Avenir Next LT Pro';
 
+      const defaultABZDataset = {
+        type: 'line',
+        label: 'Arctic-Boreal Zone',
+        fill: false,
+        borderColor: 'rgb(180,240,60)',
+        borderWidth: 1.8,
+        borderDash: [10, 5],
+        tension: 0.1
+      };
+
+      const abzDatasets = {
+        'temp-means': {
+          ...defaultABZDataset,
+          data: this.arcticThaw.arcticBorealZoneData['temp-means']
+        },
+        'frozen-days': {
+          ...defaultABZDataset,
+          data: this.arcticThaw.arcticBorealZoneData['frozen-days']
+        }
+      };
+
       const defaultTitle = {
-        display: true, color: '#efefef', font: {weight: 'normal', size: 15}
+        display: true,
+        color: '#efefef',
+        font: {weight: 'normal', size: 15}
       };
 
       const defaultLegend = {
-        display: true, onClick: null, labels: {
-          pointStyle: 'line', usePointStyle: true, color: '#efefef', filter: (item, data) => {
+        display: true,
+        onClick: null,
+        labels: {
+          pointStyle: 'line',
+          usePointStyle: true,
+          color: '#efefef',
+          filter: (item, data) => {
             return data.datasets.length;
           }
         }
       };
 
       const defaultGridLines = {
-        color: '#666666', drawBorder: true
+        color: '#666666',
+        drawBorder: true
       };
 
       const defaultDataset = {
-        fill: false, borderWidth: 1.5
+        type: 'bar',
+        barThickness: 'flex'
       };
 
       const tempMeansTrendChartNode = document.getElementById('temp-means-trend-chart');
       const tempMeansChart = new Chart(tempMeansTrendChartNode, {
-        type: 'line',
         data: {
-          datasets: []
+          datasets: [abzDatasets['temp-means']]
         },
         options: {
           animations: false,
@@ -872,11 +901,11 @@ class Application extends AppBase {
           },
           scales: {
             y: {
-              type: "linear",
+              type: 'linear',
               display: true,
               title: {
                 display: true,
-                text: 'Temperature °C',
+                text: 'Temperature °C per Decade',
                 color: '#efefef',
                 font: {size: 11}
               },
@@ -892,10 +921,10 @@ class Application extends AppBase {
               grid: defaultGridLines
             },
             x: {
-              type: 'linear',
+              type: 'category',
+              offset: true,
+              labels: ["60 yrs", "50 yrs", "40 yrs", "30 yrs", "20 yrs"],
               position: 'bottom',
-              min: 1950,
-              max: 2020,
               title: {
                 display: true,
                 text: 'Trend Duration',
@@ -904,12 +933,8 @@ class Application extends AppBase {
               },
               ticks: {
                 padding: 5,
-                stepSize: 10,
                 color: '#efefef',
-                font: {size: 11},
-                callback: (value) => {
-                  return value.toFixed(0);
-                }
+                font: {size: 11}
               },
               grid: defaultGridLines
             }
@@ -919,9 +944,8 @@ class Application extends AppBase {
 
       const frozenDaysTrendChartNode = document.getElementById('frozen-days-trend-chart');
       const frozenDaysChart = new Chart(frozenDaysTrendChartNode, {
-        type: 'line',
         data: {
-          datasets: []
+          datasets: [abzDatasets['frozen-days']]
         },
         options: {
           animations: false,
@@ -936,11 +960,11 @@ class Application extends AppBase {
           },
           scales: {
             y: {
-              type: "linear",
+              type: 'linear',
               display: true,
               title: {
                 display: true,
-                text: 'Frozen Days',
+                text: 'Frozen Days per Decade',
                 color: '#efefef',
                 font: {size: 11}
               },
@@ -953,7 +977,9 @@ class Application extends AppBase {
               grid: defaultGridLines
             },
             x: {
-              type: 'linear',
+              type: 'category',
+              offset: true,
+              labels: ["60 yrs", "50 yrs", "40 yrs", "30 yrs", "20 yrs"],
               position: 'bottom',
               title: {
                 display: true,
@@ -961,16 +987,10 @@ class Application extends AppBase {
                 color: '#efefef',
                 font: {size: 12}
               },
-              min: 1950,
-              max: 2020,
               ticks: {
                 padding: 5,
-                stepSize: 10,
                 color: '#efefef',
-                font: {size: 11},
-                callback: (value) => {
-                  return value.toFixed(0);
-                }
+                font: {size: 11}
               },
               grid: defaultGridLines
             }
@@ -978,65 +998,63 @@ class Application extends AppBase {
         }
       });
 
-      const createTrendDataset = (trendInfo, duration, decreaseColor, increaseColor) => {
+      /**
+       *
+       *
+       * @param trendInfos
+       * @param duration
+       * @param decreaseColor
+       * @param increaseColor
+       * @param _data
+       * @returns {*}
+       */
+      const createTrendDataset = (trendInfos, duration, decreaseColor, increaseColor, _data) => {
+        return trendInfos.reduce((infos, trendInfo) => {
+          if (trendInfo.slope != null) {
 
-        const isCurrentDuration = (trendInfo.duration === duration);
-        const trendColor = new Color((trendInfo.slope > 0) ? increaseColor : decreaseColor);
-        trendColor.a = isCurrentDuration ? 1.0 : 0.6;
-        const borderWidth = isCurrentDuration ? 2.0 : 1.0;
-        const borderColor = trendColor.toCss(true);
-        const pointRadius = isCurrentDuration ? 5.0 : 2.0;
-        const pointBackgroundColor = isCurrentDuration ? this.WOODWELL_COLORS.white : trendColor.toCss(true);
-        const pointBorderColor = trendColor.toCss(true);
+            const isCurrentDuration = (trendInfo.duration === duration);
+            const borderWidth = isCurrentDuration ? 1.8 : 1.2;
 
-        return {
-          ...defaultDataset,
-          borderColor,
-          borderWidth,
-          pointRadius,
-          pointBorderColor,
-          pointBackgroundColor,
-          label: `${ trendInfo.duration } yrs`,
-          data: [
-            {x: trendInfo.startYear, y: trendInfo.start},
-            {x: trendInfo.endYear, y: trendInfo.end}
-          ]
-        };
+            const trendColor = new Color((trendInfo.slope < 0.0) ? decreaseColor : increaseColor);
+            const borderColor = new Color(isCurrentDuration ? '#cccccc' : trendColor);
+            const backgroundColor = trendColor.clone();
+            backgroundColor.a = isCurrentDuration ? 1.0 : 0.5;
+
+            infos.borderWidth.push(borderWidth);
+            infos.borderColor.push(borderColor.toCss(true));
+            infos.backgroundColor.push(backgroundColor.toCss(true));
+            infos.data.push(trendInfo.slope * 10.0);
+          }
+          return infos;
+        }, {
+          borderColor: [..._data],
+          backgroundColor: [..._data],
+          borderWidth: [..._data],
+          data: [..._data]
+        });
 
       };
 
       this.addEventListener('temp-means-trends-change', ({detail: {tempMeansTrends}}) => {
-        let duration = this.getDuration();
         if (tempMeansTrends) {
-          //tempMeansChart.options.plugins.title.text = `Air Temperature - ${ duration } years`;
-          tempMeansChart.data.datasets = tempMeansTrends.filter(tempMeansTrend => {
-            return (tempMeansTrend.slope != null);
-          }).map(tempMeansTrend => {
-            return createTrendDataset(tempMeansTrend, duration, this.WOODWELL_COLORS.blue, this.WOODWELL_COLORS.red);
-          });
-          tempMeansChart.update();
+          let duration = this.getDuration();
+          const dataset = createTrendDataset(tempMeansTrends, duration, this.WOODWELL_COLORS.blue, this.WOODWELL_COLORS.red, []);
+          tempMeansChart.data.datasets[1] = {...defaultDataset, ...dataset, label: 'Temperature'};
         } else {
-          //tempMeansChart.options.plugins.title.text = `Air Temperature`;
-          tempMeansChart.data.datasets = [];
-          tempMeansChart.update();
+          tempMeansChart.data.datasets[1] = null;
         }
+        tempMeansChart.update();
       });
 
       this.addEventListener('frozen-days-trends-change', ({detail: {frozenDaysTrends}}) => {
-        let duration = this.getDuration();
         if (frozenDaysTrends) {
-          //frozenDaysChart.options.plugins.title.text = `Days with Frozen Ground - ${ duration } years`;
-          frozenDaysChart.data.datasets = frozenDaysTrends.filter(frozenDaysTrend => {
-            return (frozenDaysTrend.slope != null);
-          }).map(frozenDaysTrend => {
-            return createTrendDataset(frozenDaysTrend, duration, this.WOODWELL_COLORS.red, this.WOODWELL_COLORS.blue);
-          });
-          frozenDaysChart.update();
+          let duration = this.getDuration();
+          const dataset = createTrendDataset(frozenDaysTrends, duration, this.WOODWELL_COLORS.red, this.WOODWELL_COLORS.blue, [null, null]);
+          frozenDaysChart.data.datasets[1] = {...defaultDataset, ...dataset, label: 'Frozen Days'};
         } else {
-          //frozenDaysChart.options.plugins.title.text = `Days with Frozen Ground`;
-          frozenDaysChart.data.datasets = [];
-          frozenDaysChart.update();
+          frozenDaysChart.data.datasets[1] = null;
         }
+        frozenDaysChart.update();
       });
 
     });
