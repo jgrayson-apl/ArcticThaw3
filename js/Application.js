@@ -360,6 +360,8 @@ class Application extends AppBase {
 
         // ENABLE ABILITY TO SAVE THE WEB SCENE //
         if (this.saveMap === 'true') {
+          const rendererAction = document.getElementById('renderer-action');
+          rendererAction.toggleAttribute('hidden', false);
           const mapSaveAction = document.getElementById('map-save-action');
           mapSaveAction.toggleAttribute('hidden', false);
           mapSaveAction.addEventListener('click', () => {
@@ -833,6 +835,9 @@ class Application extends AppBase {
           animations: false,
           responsive: true,
           maintainAspectRatio: false,
+          layout: {
+            padding: 10
+          },
           plugins: {
             title: {
               ...defaultTitle,
@@ -892,6 +897,9 @@ class Application extends AppBase {
           animations: false,
           responsive: true,
           maintainAspectRatio: false,
+          layout: {
+            padding: 10
+          },
           plugins: {
             title: {
               ...defaultTitle,

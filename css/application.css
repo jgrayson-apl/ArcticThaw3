@@ -249,7 +249,8 @@ calcite-radio-group-item {
 }
 
 .trend-chart {
-  height: 250px !important;
+  width: 100%;
+  max-height: 250px !important;
 }
 
 .view-no-interaction {
