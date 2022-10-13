@@ -166,9 +166,7 @@ class Application extends AppBase {
         }
 
         this.initializeTrendCharts();
-        //this.initializeCountriesLayer({view});
         this.initializeNorthPole({view});
-        //this.initializeArcticBorealZone({view});
         this.initializeTrendLayers({view}).then(({tempMeansTrendsLayer, frozenDaysTrendLayer}) => {
           this.initializeRendererUpdates({view, tempMeansTrendsLayer, frozenDaysTrendLayer});
           this.initializeTrendOptions({view, tempMeansTrendsLayer, frozenDaysTrendLayer});
@@ -563,10 +561,11 @@ class Application extends AppBase {
    */
   initializeAnalysisLocation({view, tempMeansTrendsLayer, frozenDaysTrendLayer}) {
     require([
+      'esri/core/reactiveUtils',
       "esri/Graphic",
       'esri/layers/GraphicsLayer',
       'esri/widgets/Search'
-    ], (Graphic, GraphicsLayer, Search) => {
+    ], (reactiveUtils, Graphic, GraphicsLayer, Search) => {
 
       const baseTextSymbol = {
         type: "text",
@@ -748,7 +747,9 @@ class Application extends AppBase {
       this.initiatePlaceSearch = () => {
         return new Promise((resolve, reject) => {
           if (search.searchTerm) {
-            search.search(search.searchTerm).then(resolve).catch(reject);
+            reactiveUtils.once(()=>!view.updating).then(() => {
+              search.search(search.searchTerm).then(resolve).catch(reject);
+            });
           } else { resolve(); }
         });
       };
