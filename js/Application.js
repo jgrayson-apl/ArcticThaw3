@@ -747,7 +747,7 @@ class Application extends AppBase {
       this.initiatePlaceSearch = () => {
         return new Promise((resolve, reject) => {
           if (search.searchTerm) {
-            reactiveUtils.once(()=>!view.updating).then(() => {
+            reactiveUtils.once(() => !view.updating).then(() => {
               search.search(search.searchTerm).then(resolve).catch(reject);
             });
           } else { resolve(); }
@@ -827,6 +827,17 @@ class Application extends AppBase {
         barThickness: 'flex'
       };
 
+      const defaultTooltip = {
+        callbacks: {
+          title: (tooltipItems) => {
+            return `Trend Duration: ${ tooltipItems[0].label }`;
+          },
+          label: (tooltipItem) => {
+            return `${ tooltipItem.dataset.label }: ${ tooltipItem.formattedValue }° C`;
+          }
+        }
+      };
+
       const tempMeansTrendChartNode = document.getElementById('temp-means-trend-chart');
       const tempMeansChart = new Chart(tempMeansTrendChartNode, {
         data: {
@@ -844,7 +855,8 @@ class Application extends AppBase {
               ...defaultTitle,
               text: 'Air Temperature Trends'
             },
-            legend: defaultLegend
+            legend: defaultLegend,
+            tooltip: defaultTooltip
           },
           scales: {
             y: {
@@ -858,8 +870,7 @@ class Application extends AppBase {
               },
               ticks: {
                 padding: 5,
-                precision: 0,
-                stepSize: 1,
+                stepSize: 0.1,
                 color: '#efefef',
                 callback: (value, index, values) => {
                   return `${ value.toFixed(1) }°`;
@@ -906,7 +917,8 @@ class Application extends AppBase {
               ...defaultTitle,
               text: 'Days with Frozen Ground Trends'
             },
-            legend: defaultLegend
+            legend: defaultLegend,
+            tooltip: defaultTooltip
           },
           scales: {
             y: {
@@ -920,8 +932,7 @@ class Application extends AppBase {
               },
               ticks: {
                 padding: 5,
-                precision: 0,
-                stepSize: 30,
+                stepSize: 5,
                 color: '#efefef'
               },
               grid: defaultGridLines
