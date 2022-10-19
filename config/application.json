@@ -19,6 +19,10 @@
   },
   "shareable": [],
   "arcticThaw": {
+    "rendererStretchMinMax": {
+      "temp-means": 0.08,
+      "frozen-days": 0.80
+    },
     "arcticBorealZoneTrends": {
       "temp-means": {
         "60": 0.39,

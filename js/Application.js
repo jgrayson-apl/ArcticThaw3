@@ -445,7 +445,7 @@ class Application extends AppBase {
     };
 
     const tempMeansRenderer = document.getElementById('temp-means-renderer');
-    tempMeansRenderer.value = 0.08;
+    tempMeansRenderer.value = this.arcticThaw.rendererStretchMinMax['temp-means']; //  0.08;
     tempMeansRenderer.addEventListener('calciteSliderInput', () => {
       _updateTrendLayerRendering({
         tempMeansMinMax: tempMeansRenderer.value,
@@ -453,7 +453,7 @@ class Application extends AppBase {
       });
     });
     const frozenDaysRenderer = document.getElementById('frozen-days-renderer');
-    frozenDaysRenderer.value = 0.80;
+    frozenDaysRenderer.value = this.arcticThaw.rendererStretchMinMax['frozen-days']; //0.80;
     frozenDaysRenderer.addEventListener('calciteSliderInput', () => {
       _updateTrendLayerRendering({
         tempMeansMinMax: tempMeansRenderer.value,
