@@ -358,10 +358,11 @@ class Application extends AppBase {
 
         // ENABLE ABILITY TO SAVE THE WEB SCENE //
         if (this.saveMap === 'true') {
+
           const rendererAction = document.getElementById('renderer-action');
           rendererAction.toggleAttribute('hidden', false);
+
           const mapSaveAction = document.getElementById('map-save-action');
-          mapSaveAction.toggleAttribute('hidden', false);
           mapSaveAction.addEventListener('click', () => {
             // SAVE WEB SCENE //
             if (confirm("Are you sure you want to update and save the Web Scene?")) {
@@ -459,6 +460,13 @@ class Application extends AppBase {
         frozenDaysMinMax: frozenDaysRenderer.value
       });
     });
+
+    if (this.saveMap === 'true') {
+      _updateTrendLayerRendering({
+        tempMeansMinMax: tempMeansRenderer.value,
+        frozenDaysMinMax: frozenDaysRenderer.value
+      });
+    }
 
   }
 
