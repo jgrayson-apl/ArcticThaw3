@@ -408,8 +408,8 @@ class Application extends AppBase {
           statistics: [{
             min: -tempMeansMinMax,
             max: tempMeansMinMax,
-            avg: -0.24971247235947172,
-            stddev: 0.37222849013071047
+            avg: 0.032873465035945418,
+            stddev: 0.024470518377261125
           }],
           colorRamp: {
             type: 'multipart',
@@ -429,8 +429,8 @@ class Application extends AppBase {
           statistics: [{
             min: -frozenDaysMinMax,
             max: frozenDaysMinMax,
-            avg: -0.24971247235947172,
-            stddev: 0.37222849013071047
+            avg: -0.225642772090763,
+            stddev: 0.65678356684045258
           }],
           colorRamp: {
             type: 'multipart',

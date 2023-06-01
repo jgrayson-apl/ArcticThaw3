@@ -105,7 +105,7 @@ class AppBase extends AppConfig {
     };
 
     this.displayError = (error) => {
-      if(error.name !== 'AbortError') {
+      if(error && (error.name !== 'AbortError')) {
         noticeTitleNode.innerHTML = error.name || 'Error';
         noticeMessageNode.innerHTML = error.message || JSON.stringify(error, null, 2) || 'Something went wrong.';
         appNotice.active = true;
